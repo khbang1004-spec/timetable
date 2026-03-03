@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2학년 4반 선택과목 시간표 조회</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & ReactDOM CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel CDN (React JSX 문법 해석용) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap');
+        body { font-family: 'Pretendard', sans-serif; }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        // 학생 데이터
+        const studentsData = [
+          { id: 1, name: "고해민", a: { sub: "중국어A", room: "2-2" }, b: { sub: "도시의미래탐구B", room: "2-9" }, c: { sub: "세계시민과지리C", room: "2-7" }, d: { sub: "미술과매체D", room: "2-5" } },
+          { id: 2, name: "공혜영", a: { sub: "법과사회A", room: "2-9" }, b: { sub: "경제B", room: "2-6" }, c: { sub: "한문C", room: "2-1" }, d: { sub: "세계시민과지리D", room: "2-6" } },
+          { id: 3, name: "김나현", a: { sub: "세계시민과지리A", room: "2-8" }, b: { sub: "윤리와사상B1", room: "2-5" }, c: { sub: "사회문제탐구C", room: "2-8" }, d: { sub: "한문D", room: "2-2" } },
+          { id: 4, name: "김서진", a: { sub: "한문A", room: "2-3" }, b: { sub: "윤리와사상B1", room: "2-5" }, c: { sub: "법과사회C", room: "2-5" }, d: { sub: "미술과매체D", room: "2-5" } },
+          { id: 5, name: "김소윤", a: { sub: "일본어A", room: "2-1" }, b: { sub: "프로그래밍B", room: "별도교실" }, c: { sub: "물리학C", room: "2-12" }, d: { sub: "미술과매체D", room: "2-5" } },
+          { id: 6, name: "김예원", a: { sub: "화학A", room: "2-11" }, b: { sub: "한문B", room: "2-4" }, c: { sub: "생명과학C", room: "2-11" }, d: { sub: "물리학D", room: "2-12" } },
+          { id: 7, name: "김은서", a: { sub: "생명과학A", room: "2-12" }, b: { sub: "윤리와사상B1", room: "2-5" }, c: { sub: "한문C", room: "2-1" }, d: { sub: "화학D", room: "2-10" } },
+          { id: 8, name: "김하은", a: { sub: "기하A", room: "2-5" }, b: { sub: "화학B", room: "2-12" }, c: { sub: "한문C", room: "2-1" }, d: { sub: "생명과학D1", room: "2-9" } },
+          { id: 9, name: "문예원", a: { sub: "세계시민과지리A", room: "2-8" }, b: { sub: "일본어B", room: "2-2" }, c: { sub: "생활과학탐구C", room: "별도교실" }, d: { sub: "경제D", room: "2-8" } },
+          { id: 10, name: "박세현", a: { sub: "한문A", room: "2-3" }, b: { sub: "윤리와사상B1", room: "2-5" }, c: { sub: "화학C", room: "2-9" }, d: { sub: "생명과학D1", room: "2-9" } },
+          { id: 11, name: "박승원", a: { sub: "사회문제탐구A", room: "2-7" }, b: { sub: "생명과학B", room: "2-10" }, c: { sub: "일본어C", room: "2-3" }, d: { sub: "물리학D", room: "2-12" } },
+          { id: 12, name: "배성은", a: { sub: "세계시민과지리A", room: "2-8" }, b: { sub: "일본어B", room: "2-2" }, c: { sub: "법과사회C", room: "2-5" }, d: { sub: "윤리와사상D", room: "2-7" } },
+          { id: 13, name: "안희윤", a: { sub: "윤리와사상A", room: "2-6" }, b: { sub: "한문B", room: "2-4" }, c: { sub: "사회문제탐구C", room: "2-8" }, d: { sub: "세계시민과지리D", room: "2-6" } },
+          { id: 14, name: "오호진", a: { sub: "물리학A", room: "2-10" }, b: { sub: "일본어B", room: "2-2" }, c: { sub: "화학C", room: "2-9" }, d: { sub: "생명과학D1", room: "2-9" } },
+          { id: 15, name: "윤재선", a: { sub: "물리학A", room: "2-10" }, b: { sub: "프로그래밍B", room: "별도교실" }, c: { sub: "기하C", room: "2-2" }, d: { sub: "일본어D", room: "2-4" } },
+          { id: 16, name: "이건호", a: { sub: "한문A", room: "2-3" }, b: { sub: "화학B", room: "2-12" }, c: { sub: "물리학C", room: "2-12" }, d: { sub: "생명과학D1", room: "2-9" } },
+          { id: 17, name: "이나예", a: { sub: "일본어A", room: "2-1" }, b: { sub: "화학B", room: "2-12" }, c: { sub: "생명과학C", room: "2-11" }, d: { sub: "생활과학탐구D", room: "별도교실" } },
+          { id: 18, name: "이민주", a: { sub: "음악과미디어A", room: "음악실" }, b: { sub: "사회문제탐구B", room: "2-8" }, c: { sub: "일본어C", room: "2-3" }, d: { sub: "윤리와사상D", room: "2-7" } },
+          { id: 19, name: "이재율", a: { sub: "생명과학A", room: "2-12" }, b: { sub: "한문B", room: "2-4" }, c: { sub: "물리학C", room: "2-12" }, d: { sub: "화학D", room: "2-10" } },
+          { id: 20, name: "이지현", a: { sub: "중국어A", room: "2-2" }, b: { sub: "윤리와사상B1", room: "2-5" }, c: { sub: "사회문제탐구C", room: "2-8" }, d: { sub: "미술과매체D", room: "2-5" } },
+          { id: 21, name: "전태민", a: { sub: "사회문제탐구A", room: "2-7" }, b: { sub: "화학B", room: "2-12" }, c: { sub: "생명과학C", room: "2-11" }, d: { sub: "한문D", room: "2-2" } },
+          { id: 22, name: "조성호", a: { sub: "중국어A", room: "2-2" }, b: { sub: "생명과학B", room: "2-10" }, c: { sub: "화학C", room: "2-9" }, d: { sub: "물리학D", room: "2-12" } },
+          { id: 23, name: "조윤건", a: { sub: "한문A", room: "2-3" }, b: { sub: "경제B", room: "2-6" }, c: { sub: "세계시민과지리C", room: "2-7" }, d: { sub: "윤리와사상D", room: "2-7" } },
+          { id: 24, name: "차건우", a: { sub: "일본어A", room: "2-1" }, b: { sub: "경제B", room: "2-6" }, c: { sub: "세계시민과지리C", room: "2-7" }, d: { sub: "윤리와사상D", room: "2-7" } },
+          { id: 25, name: "최수빈", a: { sub: "일본어A", room: "2-1" }, b: { sub: "화학B", room: "2-12" }, c: { sub: "생활과학탐구C", room: "별도교실" }, d: { sub: "생명과학D1", room: "2-9" } },
+          { id: 26, name: "최예준", a: { sub: "동아시아역사기행A", room: "2-4" }, b: { sub: "물리학B", room: "2-11" }, c: { sub: "지구과학C", room: "2-10" }, d: { sub: "중국어D", room: "2-1" } },
+          { id: 27, name: "최재영", a: { sub: "중국어A", room: "2-2" }, b: { sub: "도시의미래탐구B", room: "2-9" }, c: { sub: "사회문제탐구C", room: "2-8" }, d: { sub: "윤리와사상D", room: "2-7" } },
+          { id: 28, name: "현석윤", a: { sub: "생명과학A", room: "2-12" }, b: { sub: "인공지능기초B", room: "2-1" }, c: { sub: "중국어C", room: "2-4" }, d: { sub: "생활과학탐구D", room: "별도교실" } },
+          { id: 29, name: "홍남경", a: { sub: "물리학A", room: "2-10" }, b: { sub: "화학B", room: "2-12" }, c: { sub: "생명과학C", room: "2-11" }, d: { sub: "일본어D", room: "2-4" } },
+          { id: 30, name: "홍유빈", a: { sub: "사회문제탐구A", room: "2-7" }, b: { sub: "윤리와사상B1", room: "2-5" }, c: { sub: "법과사회C", room: "2-5" }, d: { sub: "생명과학D1", room: "2-9" } },
+          { id: 31, name: "황선균", a: { sub: "음악과미디어A", room: "음악실" }, b: { sub: "윤리와사상B1", room: "2-5" }, c: { sub: "사회문제탐구C", room: "2-8" }, d: { sub: "중국어D", room: "2-1" } },
+          { id: 32, name: "황정우", a: { sub: "중국어A", room: "2-2" }, b: { sub: "생명과학B", room: "2-10" }, c: { sub: "물리학C", room: "2-12" }, d: { sub: "화학D", room: "2-10" } }
+        ];
+
+        // 메인 App 컴포넌트
+        function App() {
+            const [searchTerm, setSearchTerm] = useState('');
+            const [selectedStudent, setSelectedStudent] = useState(null);
+
+            const filteredStudents = studentsData.filter(student =>
+                student.name.includes(searchTerm) || student.id.toString() === searchTerm
+            );
+
+            const handleSelect = (student) => {
+                setSelectedStudent(student);
+                setSearchTerm('');
+            };
+
+            const generateFullSchedule = (student) => {
+                const defaultRoom = "본반";
+                return [
+                    [ // 월
+                        { sub: "대수", r: defaultRoom, t: "c" }, { sub: "영어1", r: defaultRoom, t: "c" }, { sub: "영어1", r: defaultRoom, t: "c" }, { sub: "문학", r: defaultRoom, t: "c" },
+                        { sub: student.b.sub, r: student.b.room, t: "e", b: "B" }, { sub: student.b.sub, r: student.b.room, t: "e", b: "B" }, { sub: "문학", r: defaultRoom, t: "c" }
+                    ],
+                    [ // 화
+                        { sub: "대수", r: defaultRoom, t: "c" }, { sub: "영어1", r: defaultRoom, t: "c" }, { sub: student.b.sub, r: student.b.room, t: "e", b: "B" }, { sub: student.b.sub, r: student.b.room, t: "e", b: "B" },
+                        { sub: student.a.sub, r: student.a.room, t: "e", b: "A" }, { sub: student.a.sub, r: student.a.room, t: "e", b: "A" }, { sub: "-", r: "", t: "x" }
+                    ],
+                    [ // 수
+                        { sub: "과탐실", r: "과학실", t: "c" }, { sub: student.c.sub, r: student.c.room, t: "e", b: "C" }, { sub: student.c.sub, r: student.c.room, t: "e", b: "C" }, { sub: student.d.sub, r: student.d.room, t: "e", b: "D" },
+                        { sub: student.d.sub, r: student.d.room, t: "e", b: "D" }, { sub: "창체", r: defaultRoom, t: "c" }, { sub: "창체", r: defaultRoom, t: "c" }
+                    ],
+                    [ // 목
+                        { sub: "스생1", r: "체육관", t: "c" }, { sub: "대수", r: defaultRoom, t: "c" }, { sub: "문학", r: defaultRoom, t: "c" }, { sub: "영어1", r: defaultRoom, t: "c" },
+                        { sub: student.c.sub, r: student.c.room, t: "e", b: "C" }, { sub: student.c.sub, r: student.c.room, t: "e", b: "C" }, { sub: "-", r: "", t: "x" }
+                    ],
+                    [ // 금
+                        { sub: "스생1", r: "체육관", t: "c" }, { sub: student.d.sub, r: student.d.room, t: "e", b: "D" }, { sub: student.d.sub, r: student.d.room, t: "e", b: "D" }, { sub: student.a.sub, r: student.a.room, t: "e", b: "A" },
+                        { sub: student.a.sub, r: student.a.room, t: "e", b: "A" }, { sub: "문학", r: defaultRoom, t: "c" }, { sub: "대수", r: defaultRoom, t: "c" }
+                    ]
+                ];
+            };
+
+            return (
+                <div className="min-h-screen p-4 sm:p-8 max-w-4xl mx-auto">
+                    <header className="text-center mb-10 pt-4">
+                        <div className="bg-indigo-600 text-white w-16 h-16 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <h1 className="text-3xl font-extrabold text-slate-900">2-4 선택과목 시간표</h1>
+                        <p className="text-slate-500 mt-2">이동수업 교실을 간편하게 확인하세요</p>
+                    </header>
+
+                    <div className="relative mb-8 max-w-md mx-auto">
+                        <input
+                            type="text"
+                            className="w-full px-6 py-4 rounded-2xl border-2 border-slate-200 focus:border-indigo-500 outline-none transition-all shadow-sm text-lg"
+                            placeholder="이름이나 번호를 입력 (예: 박세현)"
+                            value={searchTerm}
+                            onChange={(e) => {
+                                setSearchTerm(e.target.value);
+                                if(selectedStudent) setSelectedStudent(null);
+                            }}
+                        />
+                        {searchTerm && !selectedStudent && (
+                            <div className="absolute top-full left-0 right-0 bg-white mt-2 rounded-2xl shadow-2xl border border-slate-100 z-50 max-h-60 overflow-y-auto">
+                                {filteredStudents.length > 0 ? (
+                                    filteredStudents.map(s => (
+                                        <div key={s.id} onClick={() => handleSelect(s)} className="p-4 hover:bg-indigo-50 cursor-pointer flex items-center border-b last:border-0 border-slate-50">
+                                            <span className="bg-slate-100 text-slate-600 font-bold px-3 py-1 rounded-lg mr-4">{s.id}</span>
+                                            <span className="text-lg font-semibold">{s.name}</span>
+                                        </div>
+                                    ))
+                                ) : <div className="p-6 text-center text-slate-400">검색 결과가 없어요 🥲</div>}
+                            </div>
+                        )}
+                    </div>
+
+                    {selectedStudent && (
+                        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden animate-fade-in border border-slate-100">
+                            <div className="bg-gradient-to-r from-indigo-600 to-blue-600 p-6 text-white flex justify-between items-center">
+                                <div>
+                                    <span className="text-indigo-100 text-sm font-bold uppercase tracking-wider">Student Info</span>
+                                    <h2 className="text-2xl font-black">{selectedStudent.id}번 {selectedStudent.name}</h2>
+                                </div>
+                                <div className="text-right">
+                                    <div className="bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase">Weekly Plan</div>
+                                </div>
+                            </div>
+
+                            <div className="p-2 sm:p-6 overflow-x-auto">
+                                <table className="w-full min-w-[600px] border-separate border-spacing-2 text-center">
+                                    <thead>
+                                        <tr className="text-slate-400 text-sm">
+                                            <th className="w-12">교시</th>
+                                            {["월", "화", "수", "목", "금"].map(d => <th key={d} className="p-2 font-bold text-slate-600">{d}</th>)}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {[0,1,2,3,4,5,6].map(p => (
+                                            <tr key={p}>
+                                                <td className="font-bold text-slate-300 text-xs">{p+1}</td>
+                                                {generateFullSchedule(selectedStudent).map((day, idx) => {
+                                                    const lesson = day[p];
+                                                    if (lesson.t === "x") return <td key={idx} className="bg-slate-50 rounded-xl"></td>;
+                                                    return (
+                                                        <td key={idx} className={`p-2 rounded-2xl min-h-[80px] transition-all hover:scale-105 ${lesson.t === "e" ? 'bg-indigo-50 border border-indigo-100' : 'bg-white border border-slate-100'}`}>
+                                                            <div className="flex flex-col items-center justify-center min-h-[60px]">
+                                                                {lesson.b && <span className="text-[9px] font-black text-indigo-400 mb-1">{lesson.b} BLOCK</span>}
+                                                                <span className={`text-xs sm:text-sm font-bold leading-tight ${lesson.t === "e" ? 'text-indigo-700' : 'text-slate-700'}`}>{lesson.sub}</span>
+                                                                <div className="mt-1 flex items-center text-[10px] text-slate-400 font-medium">
+                                                                    <svg className="w-2.5 h-2.5 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                                                    {lesson.r}
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    );
+                                                })}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div className="bg-slate-50 p-4 border-t border-slate-100 flex justify-center space-x-6 text-xs font-semibold">
+                                <div className="flex items-center text-slate-500"><div className="w-2 h-2 rounded-full bg-white border border-slate-300 mr-2"></div>공통과목</div>
+                                <div className="flex items-center text-indigo-600"><div className="w-2 h-2 rounded-full bg-indigo-400 mr-2"></div>선택과목(이동)</div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
