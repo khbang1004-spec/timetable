@@ -19,6 +19,14 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        /* 테이블 셀 안의 텍스트가 넘칠 경우 처리 */
+        .subject-text {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            word-break: keep-all;
+        }
     </style>
 </head>
 <body class="bg-slate-50">
@@ -27,7 +35,7 @@
     <script type="text/babel">
         const { useState } = React;
 
-        // 학생 데이터
+        // 학생 데이터 (전체 32명)
         const studentsData = [
           { id: 1, name: "고해민", a: { sub: "중국어A", room: "2-2" }, b: { sub: "도시의미래탐구B", room: "2-9" }, c: { sub: "세계시민과지리C", room: "2-7" }, d: { sub: "미술과매체D", room: "2-5" } },
           { id: 2, name: "공혜영", a: { sub: "법과사회A", room: "2-9" }, b: { sub: "경제B", room: "2-6" }, c: { sub: "한문C", room: "2-1" }, d: { sub: "세계시민과지리D", room: "2-6" } },
@@ -63,7 +71,6 @@
           { id: 32, name: "황정우", a: { sub: "중국어A", room: "2-2" }, b: { sub: "생명과학B", room: "2-10" }, c: { sub: "물리학C", room: "2-12" }, d: { sub: "화학D", room: "2-10" } }
         ];
 
-        // 메인 App 컴포넌트
         function App() {
             const [searchTerm, setSearchTerm] = useState('');
             const [selectedStudent, setSelectedStudent] = useState(null);
@@ -109,15 +116,15 @@
                         <div className="bg-indigo-600 text-white w-16 h-16 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                         </div>
-                        <h1 className="text-3xl font-extrabold text-slate-900">2-4 선택과목 시간표</h1>
-                        <p className="text-slate-500 mt-2">이동수업 교실을 간편하게 확인하세요</p>
+                        <h1 className="text-3xl font-extrabold text-slate-900 leading-tight">2-4 선택과목 시간표</h1>
+                        <p className="text-slate-500 mt-2">이름이나 번호로 검색하세요</p>
                     </header>
 
-                    <div className="relative mb-8 max-w-md mx-auto">
+                    <div className="relative mb-12 max-w-md mx-auto">
                         <input
                             type="text"
                             className="w-full px-6 py-4 rounded-2xl border-2 border-slate-200 focus:border-indigo-500 outline-none transition-all shadow-sm text-lg"
-                            placeholder="이름이나 번호를 입력 (예: 박세현)"
+                            placeholder="예: 15 또는 윤재선"
                             value={searchTerm}
                             onChange={(e) => {
                                 setSearchTerm(e.target.value);
@@ -133,7 +140,7 @@
                                             <span className="text-lg font-semibold">{s.name}</span>
                                         </div>
                                     ))
-                                ) : <div className="p-6 text-center text-slate-400">검색 결과가 없어요 🥲</div>}
+                                ) : <div className="p-6 text-center text-slate-400">학생 정보가 없습니다.</div>}
                             </div>
                         )}
                     </div>
@@ -142,20 +149,18 @@
                         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden animate-fade-in border border-slate-100">
                             <div className="bg-gradient-to-r from-indigo-600 to-blue-600 p-6 text-white flex justify-between items-center">
                                 <div>
-                                    <span className="text-indigo-100 text-sm font-bold uppercase tracking-wider">Student Info</span>
+                                    <span className="text-indigo-100 text-xs font-bold uppercase tracking-widest opacity-80">TIME TABLE</span>
                                     <h2 className="text-2xl font-black">{selectedStudent.id}번 {selectedStudent.name}</h2>
                                 </div>
-                                <div className="text-right">
-                                    <div className="bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase">Weekly Plan</div>
-                                </div>
+                                <div className="bg-white/20 px-4 py-1.5 rounded-full text-xs font-bold">2학년 4반</div>
                             </div>
 
-                            <div className="p-2 sm:p-6 overflow-x-auto">
-                                <table className="w-full min-w-[700px] border-separate border-spacing-2 text-center table-fixed">
+                            <div className="p-2 sm:p-6 overflow-x-auto bg-white">
+                                <table className="w-full min-w-[650px] border-separate border-spacing-2 text-center table-fixed">
                                     <thead>
                                         <tr className="text-slate-400 text-sm">
-                                            <th className="w-[8%]">교시</th>
-                                            {["월", "화", "수", "목", "금"].map(d => <th key={d} className="w-[18.4%] p-2 font-bold text-slate-600">{d}</th>)}
+                                            <th className="w-[10%] p-2">교시</th>
+                                            {["월", "화", "수", "목", "금"].map(d => <th key={d} className="w-[18%] p-2 font-bold text-slate-600">{d}</th>)}
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -164,15 +169,19 @@
                                                 <td className="font-bold text-slate-300 text-xs">{p+1}</td>
                                                 {generateFullSchedule(selectedStudent).map((day, idx) => {
                                                     const lesson = day[p];
-                                                    if (lesson.t === "x") return <td key={idx} className="bg-slate-50 rounded-xl"></td>;
+                                                    // x 표시(공강) 시 빈 공간을 차지하도록 설정
+                                                    if (lesson.t === "x") return <td key={idx} className="bg-slate-50/50 rounded-2xl h-24"></td>;
+                                                    
                                                     return (
-                                                        <td key={idx} className={`p-1 rounded-2xl min-h-[85px] transition-all hover:scale-[1.02] ${lesson.t === "e" ? 'bg-indigo-50 border border-indigo-100' : 'bg-white border border-slate-100'}`}>
-                                                            <div className="flex flex-col items-center justify-center min-h-[75px] overflow-hidden">
-                                                                {lesson.b && <span className="text-[8px] font-black text-indigo-400 mb-1 leading-none">{lesson.b} BLOCK</span>}
-                                                                <span className={`text-[11px] sm:text-[13px] font-bold leading-tight px-1 break-keep ${lesson.t === "e" ? 'text-indigo-700' : 'text-slate-700'}`}>{lesson.sub}</span>
-                                                                <div className="mt-1 flex items-center text-[10px] text-slate-400 font-medium leading-none">
-                                                                    <svg className="w-2 h-2 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                                                                    {lesson.r}
+                                                        <td key={idx} className={`p-1 rounded-2xl transition-all h-24 ${lesson.t === "e" ? 'bg-indigo-50 border border-indigo-100 shadow-sm' : 'bg-white border border-slate-100'}`}>
+                                                            <div className="flex flex-col items-center justify-center h-full space-y-1">
+                                                                {lesson.b && <span className="text-[9px] font-black text-indigo-400 leading-none">{lesson.b}</span>}
+                                                                <span className={`text-[12px] sm:text-[13px] font-bold leading-tight px-1 subject-text ${lesson.t === "e" ? 'text-indigo-800' : 'text-slate-700'}`}>
+                                                                    {lesson.sub}
+                                                                </span>
+                                                                <div className="flex items-center text-[10px] text-slate-400 font-medium leading-none">
+                                                                    <svg className="w-2.5 h-2.5 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                                                    <span className="truncate">{lesson.r}</span>
                                                                 </div>
                                                             </div>
                                                         </td>
@@ -183,9 +192,9 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div className="bg-slate-50 p-4 border-t border-slate-100 flex justify-center space-x-6 text-xs font-semibold">
-                                <div className="flex items-center text-slate-500"><div className="w-2 h-2 rounded-full bg-white border border-slate-300 mr-2"></div>공통과목</div>
-                                <div className="flex items-center text-indigo-600"><div className="w-2 h-2 rounded-full bg-indigo-400 mr-2"></div>선택과목(이동)</div>
+                            <div className="bg-slate-50 p-4 border-t border-slate-100 flex justify-center space-x-8 text-[11px] font-bold tracking-tight">
+                                <div className="flex items-center text-slate-400 uppercase"><div className="w-2 h-2 rounded-full bg-white border border-slate-300 mr-2"></div> Common</div>
+                                <div className="flex items-center text-indigo-500 uppercase"><div className="w-2 h-2 rounded-full bg-indigo-500 mr-2 shadow-sm shadow-indigo-200"></div> Elective</div>
                             </div>
                         </div>
                     )}
